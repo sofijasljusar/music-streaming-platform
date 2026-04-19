@@ -1,21 +1,30 @@
 # 🎶 Music Streaming Platform
 
+## 📖 Introduction
+A collaborative project focused on designing and implementing a music streaming web application, 
+where I was responsible for backend logic.
+
+The system supports core platform features such as song streaming, playlist management, lyrics display, and music discovery through charts.
+
+__Check it out here:__ [video-demo](https://drive.google.com/file/d/1oAt5ec4JvG9i42OmB-RFVClxOY-wWobb/view?usp=sharing)
+
+## 👩🏻‍🔧 My Contribution
+- Designed and implemented relational data models for core media entities 
+- Implemented backend workflows for core application functionality
+- Automated database population using web scraping techniques
+- Also took ownership of client-side JavaScript logic for media player functionality and playlist interactions
+
+## 🏛️ Architecture & Design
+Implemented using Django and PostgreSQL, with strong emphasis on system design, collaboration, and real-world feature coverage.
+
+Key design considerations:
+- Designing data retrieval logic for media content features
+- Structuring backend components for modular and maintainable system design  
+- Modeling relationships between media entities to align with user-facing features
+
 ## 💻 Technologies Used
-- 🐍 Python
 - ⚛️ Django
-- 📄 Bootstrap
-
-## 🔍 Features
-- Stream songs
-- Create playlists
-- View top charts for artists/songs/playlists
-- View song lyrics
-
-## 📈 Planning
-- [View Project Plan](https://docs.google.com/document/d/1AvJhBkVe9igQrBHg8kZua2Sc6WczThCs15q-n5jPhe0/edit?usp=sharing)  
-
-## 🤖 Testing
-- [View Testing Documentation](https://docs.google.com/document/d/1JjoqQLRso9cvsUEmYizTeeyxMQtm1mDWlPzWGiz7tmo/edit?usp=sharing)
-
-## 🎤 Presentation
-- [Watch Project Presentation](https://docs.google.com/presentation/d/11B3u7PUcBhmemIORILSjzwRk8Xg-zQycl6gFgbuw-tI/edit?usp=sharing)
+- 💿 PostgreSQL
+- 🐳 Docker
+- ⚙️ JavaScript  
+- 🫟️ Bootstrap  
