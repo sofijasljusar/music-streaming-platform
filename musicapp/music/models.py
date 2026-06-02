@@ -3,10 +3,6 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from slugify import slugify
 from datetime import timedelta
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
-# Create your models here.
 
 
 class Genre(models.Model):
@@ -45,13 +41,6 @@ class Artist(models.Model):
     def get_platform_mixes(self):
         """Returns all platform mixes that contain songs by this artist."""
         return PlatformMix.objects.filter(songs__artists=self).distinct()
-        # if multiple songs by the same artist exist in the same mix, the mix is only returned once.
-
-    # def get_platform_mixes(self):
-    #     """Returns platform mixes where all songs belong to this artist."""
-    #     return PlatformMix.objects.annotate(
-    #         artist_count=Count('songs__artist', distinct=True)  # Count distinct artists in the mix
-    #     ).filter(artist_count=1, songs__artist=self)
 
     def __str__(self):
         return self.name
@@ -105,10 +94,10 @@ class Song(models.Model):
     def get_image(self):
         """Returns the image URL, or the default placeholder if None."""
         if self.image_url:
-            return self.image_url  # Song has its own image
-        if self.album and isinstance(self.album, ArtistAlbum) and self.album.image_url:  # isinstance so that IDE is not angry
-            return self.album.image_url  # Fallback to album image
-        return "/static/musicapp/images/song-placeholder.jpg"  # Fallback to placeholder image
+            return self.image_url
+        if self.album and self.album.image_url:
+            return self.album.image_url
+        return "/static/musicapp/images/song-placeholder.jpg"
 
     def __str__(self):
         artists_names = ", ".join(artist.name for artist in self.artists.all())
@@ -142,21 +131,13 @@ class UserPlaylist(SongCollection):
             return first_song.get_image()  # Use the first song's image, whether it's the song or album image
         return "/static/musicapp/images/playlist-placeholder.jpg"  # Fallback to playlist placeholder
 
-    @receiver(post_save, sender=User)
-    def create_favorites_playlist(sender, instance, created, **kwargs):
-        """Automatically create an empty 'My favorites' playlist for each new user."""
-        if created:
-            UserPlaylist.objects.create(owner=instance, name="My favorites")
-
 
 class UserPlaylistSong(models.Model):
     playlist = models.ForeignKey(UserPlaylist, on_delete=models.CASCADE)
-    # when playlist is deleted, all UserPlaylistSongs will be deleted too
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
-    # when Song is deleted, in all playlists this song will be deleted
     date_added = models.DateField(auto_now_add=True)
 
-    class Meta:  # ensures that the same song cannot be added to the same playlist twice
+    class Meta:
         constraints = [
             models.UniqueConstraint(fields=['playlist', 'song'], name='unique_playlist_song')
         ]
