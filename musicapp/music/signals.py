@@ -6,6 +6,5 @@ from .models import UserPlaylist
 
 @receiver(post_save, sender=User)
 def create_favorites_playlist(sender, instance, created, **kwargs):
-    """Automatically create an empty 'My favorites' playlist for each new user."""
     if created:
         UserPlaylist.objects.create(owner=instance, name="My favorites")
