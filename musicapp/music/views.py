@@ -1,13 +1,13 @@
 from django.db.models import Q
 from django.shortcuts import render
 
-# Create your views here.
 from django.views.generic import TemplateView, DetailView, CreateView, View
 from .models import Song, Artist, ArtistAlbum, PlatformMix, UserPlaylist
 from django.urls import reverse_lazy
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-from .forms import SignUpForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.views import LoginView
+from .forms import SignUpForm, LoginForm
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -33,6 +33,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
+
+User = get_user_model()
 
 load_dotenv()
 
@@ -939,55 +942,21 @@ class MixDetailView(DetailView):
     pk_url_kwarg = 'id'
 
 
-class SignUpView(View):
-    def get(self, request):
-        return render(request, 'signup.html')
+class SignUpView(CreateView):
+    model = User
+    form_class = SignUpForm
+    template_name = "signup.html"
+    success_url = reverse_lazy("home")
 
-    def post(self, request):
-        email = request.POST['email']
-        username = request.POST['username']
-        password = request.POST['password1']
-        password2 = request.POST['password2']
-
-        if password == password2:
-            if User.objects.filter(email=email).exists():
-                messages.info(request, 'Email Taken')
-                return redirect('signup')
-            elif User.objects.filter(username=username).exists():
-                messages.info(request, 'Username Taken')
-                return redirect('signup')
-            else:
-                user = User.objects.create_user(username=username, email=email, password=password)
-                user.save()
-
-                # log the user in
-                user_login = authenticate(request, username=username, password=password)
-                login(request, user_login)
-                next_url = request.POST.get('next') or '/'
-                return redirect(next_url)
-        else:
-            messages.info(request, 'Password Not Matching')
-            return redirect('signup')
+    def form_valid(self, form):
+        user = form.save()
+        login(self.request, user)
+        return redirect(self.success_url)
 
 
-class LoginView(View):
-    def get(self, request):
-        return render(request, 'login.html')
-
-    def post(self, request):
-        username = request.POST['username']
-        password = request.POST['password']
-
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-            next_url = request.POST.get('next') or '/'
-            return redirect(next_url)
-        else:
-            messages.info(request, 'Credentials Invalid')
-            return redirect('login')
-
+class LogInView(LoginView):
+    template_name = "login.html"
+    authentication_form = LoginForm
 
 class SearchView(TemplateView):
     template_name = 'Search.html'
