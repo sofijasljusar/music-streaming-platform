@@ -990,31 +990,12 @@ class AddToFavoritesView(View):
         song = get_object_or_404(Song, id=song_id)
 
         favorites_playlist, created = UserPlaylist.objects.get_or_create(owner=user, name="My favorites")
+        favorite_song = UserPlaylistSong.objects.filter(playlist=favorites_playlist, song=song).first()
 
-        if not UserPlaylistSong.objects.filter(playlist=favorites_playlist, song=song).exists():
+        if not favorite_song:
             UserPlaylistSong.objects.create(playlist=favorites_playlist, song=song)
-
-            # Return the filled heart SVG icon when added
-            icon_svg = '''
-            <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="#e600ff">
-                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                                       2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09
-                                       C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
-                                       c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                            </svg>
-            '''
-            return JsonResponse({'status': 'added', 'icon': icon_svg})
+            return JsonResponse({'status': 'added'})
 
         else:
-            # If the song is already in the playlist, return the empty heart SVG icon
-            playlist_song = UserPlaylistSong.objects.filter(playlist=favorites_playlist, song=song).first()
-            playlist_song.delete()
-            icon_svg = '''
-            <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#e600ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                                       2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09
-                                       C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
-                                       c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                            </svg>
-            '''
-            return JsonResponse({'status': 'already_added', 'icon': icon_svg})
+            favorite_song.delete()
+            return JsonResponse({'status': 'removed'})
