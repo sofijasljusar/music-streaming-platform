@@ -18,6 +18,7 @@ from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import get_object_or_404
 from .models import UserPlaylist, UserPlaylistSong, Song
+from .constants import FEATURED_ARTIST_IDS
 import requests
 from googletrans import Translator
 import base64
@@ -46,77 +47,18 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # official spotify API
-        # top_ukrainian_artists = ["6wbEgVlGqWb4I9tbMluu5Q",  # spotify ids
-        #                          "5RqIkHQnXRZlm1ozfSS1IO",
-        #                          "5BwbVAdT6rFF2vGVE8su2y",
-        #                          "6NTzEgUmN1PIBIYEHhf1kS",
-        #                          "2c3PFZtun8HemDbDfRPV6G",
-        #                          "7wl1m5vgWkCP3cqYVj2noM",
-        #                          "6l5IEx62Nsc2k1QyfaWvEz",
-        #                          ]
-        #
-        # top_ukrainian_artists = ["11sIz9STeD6yVSuBaD8nMW"]
-        #
-        # names = []
-        #
-        # # SCRAPER FOR IMAGES (INCLUDING HEADER IMAGE)
-        # for artist_id in top_ukrainian_artists:
-        #     print("HELLOOO")
-        #     url = "https://spotify-scraper3.p.rapidapi.com/api/artists/info"
-        #     params = {"id": artist_id}
-        #     headers = {
-        #         "x-rapidapi-key": os.getenv("RAPID_API_KEY"),
-        #         "x-rapidapi-host": "spotify-scraper3.p.rapidapi.com"
-        #     }
-        #
-        #     response = requests.get(url, headers=headers, params=params)
-        #     print(response)
-        #     if response.status_code == 200:
-        #         data = response.json()["data"]["artist"]
-        #         name = data["name"]
-        #         avatar_img = data["avatar_images"][0]["url"]
-        #         header_img = data["header_images"][0]["url"]
-        #         names.append(name)
-        #         artist, created = Artist.objects.get_or_create(
-        #             name=name,
-        #             defaults={
-        #                 "profile_image": avatar_img,
-        #                 "detail_image": header_img,
-        #                 "spotify_id": artist_id,
-        #             }
-        #         )
-        #
-        #         if created:
-        #             print("Artist was just added to the database!")
-        #         else:
-        #             print("Artist already existed, maybe update info if needed.")
-        #
-        #         print("Info:"
-        #               "\nname- " + name +
-        #               "\navatar_img- " + avatar_img +
-        #               "\nheader_img- " + header_img)
-        #
-        # print(names)
+        # For now predefined artists
+        # Todo: Later add feature for user upon sign up to search for artists he wants to listen to
 
-        # For now predefines artists
-        # todo: Later add feature for user upon sign up to search for artists he wants to listen to
-        names = ['MONATIK', 'Скрябін', 'Klavdia Petrivna', 'Okean Elzy', 'Boombox', 'DOROFEEVA', 'Wellboy']
+        base_queryset = Song.objects.filter(
+            artists__spotify_id__in=FEATURED_ARTIST_IDS
+        ).exclude(
+            Q(audio_url="https://example.com") | Q(lyrics="")  # only show songs with full data
+        )
 
-        # context["form"] = CustomUserCreationForm()
-        context['new_releases'] = Song.objects.filter(
-            artists__name__in=names
-        ).exclude(
-            Q(audio_url="https://example.com") | Q(lyrics="")
-        ).order_by('-release_date')[:6]
-        # context['new_releases'] = Song.objects.order_by('-release_date')[:6]  # Fetch latest 6 songs
-        context['trending_songs'] = Song.objects.filter(
-            artists__name__in=names
-        ).exclude(
-            Q(audio_url="https://example.com") | Q(lyrics="")
-        ).order_by('-popularity')[:10]
-        # context['trending_songs'] = Song.objects.order_by('-release_date')[:10]  # Example logic for trending
-        context['popular_artists'] = Artist.objects.filter(name__in=names)  # Fetch first 7 artists
+        context['new_releases'] = base_queryset.order_by('-release_date')[:6]
+        context['trending_songs'] = base_queryset.order_by('-popularity')[:10]
+        context['popular_artists'] = Artist.objects.filter(spotify_id__in=FEATURED_ARTIST_IDS)
         return context
 
 
