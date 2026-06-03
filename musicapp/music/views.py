@@ -117,17 +117,6 @@ class HomeView(TemplateView):
         return context
 
 
-# class RegisterView(CreateView):
-#     form_class = CustomUserCreationForm
-#     success_url = reverse_lazy("home")  # or any page you want to redirect to
-#     template_name = "Home.html"  # not used since we're embedding form
-#
-#     def form_valid(self, form):
-#         response = super().form_valid(form)
-#         login(self.request, self.object)  # auto-login after signup
-#         return response
-
-
 class ArtistsView(LoginRequiredMixin, TemplateView):
     login_url = 'login'
     template_name = 'Artists.html'
@@ -903,22 +892,11 @@ class PlaylistView(LoginRequiredMixin, TemplateView):
     login_url = 'login'
     template_name = 'Playlist.html'
 
-    # def dispatch(self, request, *args, **kwargs):
-    #     # Check if the user has a 'MyFavorites' playlist, if not, create it
-    #     playlist, created = UserPlaylist.objects.get_or_create(
-    #         owner=self.request.user,
-    #         name="MyFavorites"
-    #     )
-    #     # Proceed with the regular dispatch
-    #     return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Get the 'MyFavorites' playlist and its songs
         user = self.request.user
-        favorites_playlist = user.userplaylist_set.filter(name="My favorites").first()
-        playlist = UserPlaylist.objects.get(owner=self.request.user, name="My favorites")
-        context['playlist_songs'] = favorites_playlist.get_songs()  # Get songs in the 'MyFavorites' playlist
+        favorites_playlist = user.userplaylist_set.get(name="My favorites")
+        context['playlist_songs'] = favorites_playlist.get_songs()
         return context
 
 
@@ -944,7 +922,7 @@ class SongView(LoginRequiredMixin, DetailView):
     model = Song
     template_name = 'Song.html'
     context_object_name = 'song'
-    pk_url_kwarg = 'id'  # Tell Django to use "id" instead of "pk"
+    pk_url_kwarg = 'id'
 
 
 class AlbumDetailView(DetailView):
@@ -1020,11 +998,8 @@ class SearchView(TemplateView):
         search_query = self.request.GET.get('search_query', '')
 
         if search_query:
-            # Search Songs
             songs = Song.objects.filter(name__icontains=search_query)
-            # Search Artists
             artists = Artist.objects.filter(name__icontains=search_query)
-            # Search Albums
             albums = ArtistAlbum.objects.filter(name__icontains=search_query)
         else:
             songs = []
@@ -1038,18 +1013,6 @@ class SearchView(TemplateView):
         return context
 
 
-# @method_decorator(csrf_exempt, name='dispatch')  # For simplicity — CSRF token is safer!
-# class AddToFavoritesView(LoginRequiredMixin, View):
-#     def post(self, request, *args, **kwargs):
-#         data = json.loads(request.body)
-#         song_id = data.get('song_id')
-#         try:
-#             song = Song.objects.get(id=song_id)
-#             playlist, _ = UserPlaylist.objects.get_or_create(owner=request.user, name="MyFavorites")
-#             playlist.songs.add(song)
-#             return JsonResponse({'success': True})
-#         except Song.DoesNotExist:
-#             return JsonResponse({'success': False, 'error': 'Song not found'})
 class AddToFavoritesView(View):
     """Class-based view to add a song to the user's 'My favorites' playlist."""
 
@@ -1057,12 +1020,9 @@ class AddToFavoritesView(View):
         user = request.user
         song = get_object_or_404(Song, id=song_id)
 
-        # Get or create the "My favorites" playlist for the user
         favorites_playlist, created = UserPlaylist.objects.get_or_create(owner=user, name="My favorites")
 
-        # Check if the song is already in the playlist
         if not UserPlaylistSong.objects.filter(playlist=favorites_playlist, song=song).exists():
-            # Add the song to the playlist
             UserPlaylistSong.objects.create(playlist=favorites_playlist, song=song)
 
             # Return the filled heart SVG icon when added
