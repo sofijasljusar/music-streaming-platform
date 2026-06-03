@@ -1,9 +1,7 @@
-import datetime
 from django.contrib import admin
-from .utils import image_preview_detail, image_preview_list
+from .utils import get_image_preview
 from .templatetags.custom_filters import format_duration
 
-# Register your models here.
 from .models import Artist, ArtistAlbum, Song, PlatformMix, UserPlaylist, UserPlaylistSong, Genre
 
 
@@ -11,23 +9,34 @@ class SongCollectionAdmin(admin.ModelAdmin):
     list_display = ['name', 'image_preview_list', 'get_total_duration', 'get_amount_of_songs']
     readonly_fields = ('image_preview_detail',)
 
+    @admin.display(description="Image")
+    def image_preview_list(self, obj):
+        return get_image_preview(obj, 50)
+
+    @admin.display(description="Image Preview")
+    def image_preview_detail(self, obj):
+        return get_image_preview(obj, 500)
+
+    @admin.display(description="Total Duration")
     def get_total_duration(self, obj):
         return format_duration(obj.get_total_duration())
 
+    @admin.display(description="Number of Songs")
     def get_amount_of_songs(self, obj):
         return obj.get_amount_of_songs()
-
-    image_preview_detail = staticmethod(image_preview_detail)
-    image_preview_list = staticmethod(image_preview_list)
-    get_total_duration.short_description = "Total Duration"
-    get_amount_of_songs.short_description = "Number of Songs"
 
 
 class SongAdmin(admin.ModelAdmin):
     list_display = ['name', 'image_preview_list', 'release_date', 'album', 'duration']
     readonly_fields = ('image_preview_detail',)
-    image_preview_detail = staticmethod(image_preview_detail)
-    image_preview_list = staticmethod(image_preview_list)
+
+    @admin.display(description="Image")
+    def image_preview_list(self, obj):
+        return get_image_preview(obj, 50)
+
+    @admin.display(description="Image Preview")
+    def image_preview_detail(self, obj):
+        return get_image_preview(obj, 500)
 
 
 class ArtistAlbumInline(admin.TabularInline):
@@ -35,20 +44,13 @@ class ArtistAlbumInline(admin.TabularInline):
     extra = 0
 
 
-# class SongInline(admin.TabularInline):
-#     model = Song
-#     extra = 0
-
-
 class ArtistAdmin(admin.ModelAdmin):
     inlines = [ArtistAlbumInline]
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         artist = self.get_object(request, object_id)
-        # Fetch related songs using the ManyToMany relationship
         songs = Song.objects.filter(artists=artist)
 
-        # Add the songs to the context
         if extra_context is None:
             extra_context = {}
         extra_context['songs'] = songs
@@ -57,12 +59,12 @@ class ArtistAdmin(admin.ModelAdmin):
 
 
 class ArtistAlbumAdmin(SongCollectionAdmin):
-    list_display = SongCollectionAdmin.list_display + ['owner', 'release_date', "get_songs"]  # Add extra fields
+    list_display = SongCollectionAdmin.list_display + ['owner', 'release_date', "songs_preview"]
 
-    def get_songs(self, obj):
-        return ", ".join(song.name for song in obj.songs.all())
+    @admin.display(description="Songs")
+    def songs_preview(self, obj):
+        return ", ".join(obj.songs.values_list("name", flat=True)[:5])
 
-    get_songs.short_description = 'Songs'
 
 class UserPlaylistSongInline(admin.TabularInline):
     model = UserPlaylistSong
