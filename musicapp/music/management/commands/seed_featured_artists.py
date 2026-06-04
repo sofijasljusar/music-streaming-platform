@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 if created:
                     logger.info("Created artist: %s", name)
                 else:
-                    logger.info("Created artist: %s", name)
+                    logger.info("Updated artist: %s", name)
 
             except requests.RequestException as e:
                 logger.error("Request failed for %s: %s", artist_id, e)
