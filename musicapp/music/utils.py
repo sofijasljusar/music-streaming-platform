@@ -19,14 +19,10 @@ def get_image_preview(obj, size):
 
 
 def image_preview_list(obj):
-    """Returns a larger image preview (50x50)"""
+    """Returns a smaller image preview (50x50)"""
     return get_image_preview(obj, 50)
 
 
 def image_preview_detail(obj):
     """Returns a larger image preview (500x500)"""
     return get_image_preview(obj, 500)
-
-
-image_preview_list.short_description = "Image"
-image_preview_detail.short_description = "Image Preview"

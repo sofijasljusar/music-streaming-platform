@@ -112,3 +112,19 @@ POPULAR_ARTIST_IDS = [
     "50co4Is1HCEo8bhOyUWKpn"
 ]
 
+FEATURED_MIXES_IDS = ['37i9dQZF1DX5ECfKO3L7Vd', '37i9dQZF1DX1V3tM4cuX0v', '37i9dQZF1DXcU2mDfNlJqd',
+             '37i9dQZF1DWZU4i93guc1c', '37i9dQZF1DWTtjLYc6QFF2', '37i9dQZF1DX69uAEiqiuHZ',
+             '37i9dQZF1DX9lOLSAzbbCv', '37i9dQZF1DX5zxOB6DkdZY', '37i9dQZF1DX2X2YHi92QqA',
+             '37i9dQZF1DWUxthdWUs4N4', '37i9dQZF1DWW5PAbWFxH0K']
+
+
+FEATURED_RADIO_MIXES_IDS = ['37i9dQZF1E4l2ioIaCjhu0', '37i9dQZF1E4l6urr0WyrHk', '37i9dQZF1E4wuO62icjSo9',
+                           '37i9dQZF1E4tLXl1ytNjGw',
+                           '37i9dQZF1E4A8y674xzcYv', '37i9dQZF1E4vm60o07iwlG', '37i9dQZF1E4noT0MbKz5Ed',
+                           '37i9dQZF1E4DTZUur7HqeC',
+                           '37i9dQZF1E4xO7AcESjSyV', '37i9dQZF1E4Bz1Tyga0dyF', '37i9dQZF1E4xxHdVdUnARi',
+                           '37i9dQZF1E4AfgteCrizQG',
+                           '37i9dQZF1E4vkBCi0dJzdI', '37i9dQZF1E4xQ4S5eUfiuo', '37i9dQZF1E4FCYxweFnGWe',
+                           '37i9dQZF1E4sPFmlETtBHH',
+                           '37i9dQZF1E4yl1BBzACV3o', '37i9dQZF1E4wXrG4w9c53u', '37i9dQZF1E4yQINTazcB01',
+                           '37i9dQZF1E4ptINQIygp3c']
