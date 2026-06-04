@@ -1,5 +1,5 @@
 from django.utils.html import format_html
-
+import datetime
 
 def get_image_preview(obj, size):
     """
@@ -18,11 +18,15 @@ def get_image_preview(obj, size):
     )
 
 
-def image_preview_list(obj):
-    """Returns a smaller image preview (50x50)"""
-    return get_image_preview(obj, 50)
+def parse_release_date(value):
+        if len(value) == 4:
+            value = f"{value}-01-01"
+
+        return datetime.datetime.strptime(
+                value,
+                "%Y-%m-%d",
+            ).date()
 
 
-def image_preview_detail(obj):
-    """Returns a larger image preview (500x500)"""
-    return get_image_preview(obj, 500)
+def milliseconds_to_timedelta(milliseconds: int) -> datetime.timedelta:
+    return datetime.timedelta(milliseconds=milliseconds)

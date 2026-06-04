@@ -128,3 +128,5 @@ FEATURED_RADIO_MIXES_IDS = ['37i9dQZF1E4l2ioIaCjhu0', '37i9dQZF1E4l6urr0WyrHk', 
                            '37i9dQZF1E4sPFmlETtBHH',
                            '37i9dQZF1E4yl1BBzACV3o', '37i9dQZF1E4wXrG4w9c53u', '37i9dQZF1E4yQINTazcB01',
                            '37i9dQZF1E4ptINQIygp3c']
+
+MISSING_AUDIO_URL = "https://example.com"
